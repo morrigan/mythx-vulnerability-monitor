@@ -1,0 +1,15 @@
+FROM nodefactory/nodejs-ts-starter:latest
+
+RUN yarn run build
+
+FROM node:carbon-alpine
+
+WORKDIR /app
+
+COPY --from=0 /usr/app/dist/src /app
+COPY --from=0 /usr/app/package.json /app/
+COPY --from=0 /usr/app/yarn.lock /app/
+
+RUN yarn install --frozen-lockfile --production && yarn cache clean
+
+CMD ["node", "index.js"]
